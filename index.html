@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search-Sort Visualizer</title>
+    <link rel="stylesheet" href="css/output.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/visualizer.css">
+    <script>
+        // Apply saved theme synchronously to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const isDark = savedTheme === 'dark' || !savedTheme; // Default to dark if no saved theme
+            document.documentElement.className = isDark ? 'dark' : '';
+        })();
+    </script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body class="bg-[var(--background)] min-h-screen text-[var(--foreground)] transition-colors duration-300">
+    <div class="container mx-auto px-4 py-8">
+        <div class="relative mb-8">
+            <h1 class="text-4xl font-bold text-center gradient-heading">
+                Search-Sort Visualizer
+            </h1>
+            <button class="theme-toggle absolute right-0 top-1/2 -translate-y-1/2 bg-[var(--accent)] text-[var(--accent-foreground)] border-none rounded-[var(--radius)] p-2 sm:p-3 cursor-pointer transition-all hover:bg-[var(--primary)] hover:text-[var(--primary-foreground)]"
+                id="themeToggle" aria-label="Toggle theme">
+                <svg id="themeIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-[var(--card)] rounded-[var(--radius)] p-6 mb-8 border border-[var(--border)]">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Algorithm Type</label>
+                    <select id="algorithmType" class="w-full p-2 rounded-[var(--radius)] border">
+                        <option value="sort">Sorting</option>
+                        <option value="search">Searching</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Algorithm</label>
+                    <select id="algorithm" class="w-full p-2 rounded-[var(--radius)] border">
+                        <option value="bubble">Bubble Sort</option>
+                        <option value="selection">Selection Sort</option>
+                        <option value="insertion">Insertion Sort</option>
+                        <option value="merge">Merge Sort</option>
+                        <option value="quick">Quick Sort</option>
+                        <option value="heap">Heap Sort</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Array Size</label>
+                    <input type="range" id="arraySize" min="5" max="50" value="20" class="w-full">
+                    <span id="arraySizeValue" class="text-sm text-[var(--muted-foreground)]">20</span>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Speed</label>
+                    <input type="range" id="speed" min="1" max="10" value="5" class="w-full">
+                    <span id="speedValue" class="text-sm text-[var(--muted-foreground)]">5</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Custom Array (comma-separated)</label>
+                    <input type="text" id="customArray" placeholder="e.g., 10,20,30,40" class="w-full p-2 rounded-[var(--radius)] border">
+                    <p id="customArrayError" class="error-message"></p>
+                </div>
+                <div class="flex items-end">
+                    <button id="loadCustomArray" class="px-4 py-2 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                        Load Custom Array
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button id="generateArray" class="px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                    Generate New Array
+                </button>
+                <button id="startAlgorithm" class="px-4 py-2 bg-[var(--chart-2)] text-[var(--primary-foreground)] rounded-[var(--radius)] hover:bg-[var(--chart-1)] transition-colors">
+                    Start Algorithm
+                </button>
+                <button id="pausePlayAlgorithm" class="px-4 py-2 bg-[var(--accent)] text-[var(--accent-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                    <svg id="pausePlayIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
+                    </svg>
+                </button>
+                <button id="stopAlgorithm" class="px-4 py-2 bg-[var(--destructive)] text-[var(--primary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                    Stop
+                </button>
+                <button id="resetArray" class="px-4 py-2 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                    Reset
+                </button>
+            </div>
+
+            <!-- Copy Array Controls for Sorting -->
+            <div id="csvControls" class="flex flex-wrap gap-2 mb-4">
+                <button id="copyOriginalArray" class="px-4 py-2 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                    <svg id="copyOriginalIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Original Array
+                </button>
+                <button id="copySortedArray" class="px-4 py-2 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <svg id="copySortedIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Sorted Array
+                </button>
+            </div>
+            
+            <!-- Search specific controls -->
+            <div id="searchControls" class="hidden">
+                <div class="flex gap-4 items-center">
+                    <label class="text-sm font-medium">Search Value:</label>
+                    <input type="number" id="searchValue" class="w-20 p-2 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] text-[var(--card-foreground)]" value="50">
+                    <button id="addSearchValue" class="px-3 py-1 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-[var(--radius)] hover:bg-[var(--ring)] transition-colors">
+                        Add to Array
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Visualization -->
+        <div class="bg-[var(--card)] rounded-[var(--radius)] p-6 mb-8 border border-[var(--border)]">
+            <div id="arrayContainer" class="flex justify-center items-end gap-1 min-h-[300px] mb-4">
+                <!-- Array bars will be generated here -->
+            </div>
+            
+            <!-- Algorithm Info -->
+            <div id="algorithmInfo" class="bg-[var(--secondary)] rounded-[var(--radius)] p-4 mb-4">
+                <h3 class="text-lg font-semibold mb-2">Algorithm Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <span class="font-medium text-[var(--muted-foreground)]">Time Complexity:</span>
+                        <span id="timeComplexity">O(n²)</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-[var(--muted-foreground)]">Space Complexity:</span>
+                        <span id="spaceComplexity">O(1)</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-[var(--muted-foreground)]">Stable:</span>
+                        <span id="stable">Yes</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step Counter -->
+            <div class="flex justify-between items-center text-sm">
+                <div>
+                    <span class="font-medium text-[var(--muted-foreground)]">Steps:</span>
+                    <span id="stepCount">0</span>
+                </div>
+                <div>
+                    <span class="font-medium text-[var(--muted-foreground)]">Comparisons:</span>
+                    <span id="comparisonCount">0</span>
+                </div>
+                <div>
+                    <span class="font-medium text-[var(--muted-foreground)]">Swaps:</span>
+                    <span id="swapCount">0</span>
+                </div>
+                <div id="searchResult" class="hidden">
+                    <span class="font-medium text-[var(--muted-foreground)]">Result:</span>
+                    <span id="searchResultText">Not found</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Algorithm Description -->
+        <div class="bg-[var(--card)] rounded-[var(--radius)] p-6 border border-[var(--border)]">
+            <h3 class="text-lg font-semibold mb-2">How it works:</h3>
+            <p id="algorithmDescription" class="text-[var(--muted-foreground)] leading-relaxed"></p>
+        </div>
+    </div>
+</body>
+</html>

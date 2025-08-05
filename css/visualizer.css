@@ -1,0 +1,88 @@
+@keyframes highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.highlight {
+    animation: highlight 0.3s ease-in-out;
+}
+
+.array-bar {
+    transition: all 0.3s ease;
+}
+
+select, input[type="number"], input[type="text"] {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-color: var(--border);
+}
+
+select:focus, input[type="number"]:focus, input[type="text"]:focus {
+    outline: 2px solid var(--primary);
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#arrayContainer {
+    display: flex;
+    align-items: flex-end;
+    min-height: 300px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.array-bar {
+    flex: 0 0 auto;
+    margin: 0 1px;
+    position: relative;
+}
+
+.gradient-heading {
+    background: linear-gradient(90deg, var(--chart-2), var(--chart-3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.error-message {
+    color: var(--destructive);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+/* View transition styles for theme toggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    z-index: 0;
+}
+
+::view-transition-new(root) {
+    z-index: 1;
+    animation: reveal 0.4s ease-in-out forwards;
+}
+
+@keyframes reveal {
+    from {
+        clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+        opacity: 0.7;
+    }
+    to {
+        clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+        opacity: 1;
+    }
+}
