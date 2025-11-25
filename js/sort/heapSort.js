@@ -46,7 +46,7 @@ export async function heapSort() {
     }
 }
 
-async function heapify(n, i, isBuildPhase = false) {
+export async function heapify(n, i, isBuildPhase = false) {
     let largest = i;
     let left = 2 * i + 1;
     let right = 2 * i + 2;

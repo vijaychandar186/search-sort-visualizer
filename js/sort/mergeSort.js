@@ -20,7 +20,7 @@ export async function mergeSort(left, right, depth = 0) {
     }
 }
 
-async function merge(left, mid, right, depth = 0) {
+export async function merge(left, mid, right, depth = 0) {
     const leftArr = this.visualizer.array.slice(left, mid + 1);
     const rightArr = this.visualizer.array.slice(mid + 1, right + 1);
 

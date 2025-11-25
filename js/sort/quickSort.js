@@ -24,7 +24,7 @@ export async function quickSort(low, high, depth = 0) {
     }
 }
 
-async function partition(low, high, depth = 0) {
+export async function partition(low, high, depth = 0) {
     const pivot = this.visualizer.array[high];
     this.visualizer.arrayRenderer.renderArray([high], ['bg-[var(--chart-1)]']);
     await this.visualizer.sleep(this.visualizer.getDelay());

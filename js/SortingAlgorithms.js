@@ -1,9 +1,9 @@
 import { bubbleSort } from './sort/bubbleSort.js';
 import { selectionSort } from './sort/selectionSort.js';
 import { insertionSort } from './sort/insertionSort.js';
-import { mergeSort } from './sort/mergeSort.js';
-import { quickSort } from './sort/quickSort.js';
-import { heapSort } from './sort/heapSort.js';
+import { mergeSort, merge } from './sort/mergeSort.js';
+import { quickSort, partition } from './sort/quickSort.js';
+import { heapSort, heapify } from './sort/heapSort.js';
 
 export class SortingAlgorithms {
     constructor(visualizer) {
@@ -14,6 +14,11 @@ export class SortingAlgorithms {
         this.mergeSort = mergeSort.bind(this);
         this.quickSort = quickSort.bind(this);
         this.heapSort = heapSort.bind(this);
+
+        // Bind helper functions
+        this.merge = merge.bind(this);
+        this.partition = partition.bind(this);
+        this.heapify = heapify.bind(this);
     }
 
     async runSortingAlgorithm(algorithm) {
